@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.zlambda.projects.emjetty</groupId>
+    <artifactId>emjetty</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!--project related-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.javaVersion>1.8</project.build.javaVersion>
+        <emjetty.version>1.0.0-SNAPSHOT</emjetty.version>
+
+        <!--library versions-->
+        <jetty.version>9.3.11.v20160721</jetty.version>
+        <log4j.core.version>2.6.1</log4j.core.version>
+        <log4j.api.version>2.6.1</log4j.api.version>
+
+        <!--library versions-->
+        <junit.version>4.8.2</junit.version>
+        <mockito.version>1.9.5</mockito.version>
+        <okhttp.version>3.3.1</okhttp.version>
+        <jsoup.version>1.9.2</jsoup.version>
+        <guava.version>19.0</guava.version>
+        <jackson.version>2.7.0</jackson.version>
+        <apache.commons.io.version>2.4</apache.commons.io.version>
+        <apache.commons.lang3.version>3.0</apache.commons.lang3.version>
+        <log4j.core.version>2.6.1</log4j.core.version>
+        <log4j.api.version>2.6.1</log4j.api.version>
+        <reflections.version>0.9.10</reflections.version>
+
+        <!--maven plugins versions-->
+        <maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
+        <maven.assembly.pluing.version>2.6</maven.assembly.pluing.version>
+        <maven.shade.plugin.version>2.4.3</maven.shade.plugin.version>
+    </properties>
+
+    <modules>
+        <module>emjetty-core</module>
+        <module>emjetty-examples</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--project internal-->
+            <dependency>
+                <groupId>org.zlambda.projects.emjetty</groupId>
+                <artifactId>emjetty-core</artifactId>
+                <version>${emjetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.zlambda.projects.emjetty</groupId>
+                <artifactId>emjetty-examples</artifactId>
+                <version>${emjetty.version}</version>
+            </dependency>
+            <!--jetty related-->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-annotations</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-plus</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <!-- other -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.core.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${project.build.javaVersion}</source>
+                        <target>${project.build.javaVersion}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <showDeprecation>true</showDeprecation>
+                        <showWarnings>true</showWarnings>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
