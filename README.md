@@ -1,6 +1,25 @@
 # Embedded Jetty
 This project help quickly embed Jetty into application.
 
+# TODO
+
+## Better structure executable war
+
+Provide custom class loader to bootstrap application. Then we can have a better executable war structure
+
+```
+executable war
+    ...
+    org/zlambda/projects/emjetty/bootstrap/ExecutableWarBootstrap.class
+    - WEB-INF
+        ...
+        - classes
+        - lib
+            - user application dependencies
+        - lib-provided
+            - emjetty-core.jar
+```
+
 # Embedded Servlet Container
 Class `EmbeddedServletContainer` helps build an executable war. Simply, you just create your servlet web application like the way you do with the traditional container. 
 
