@@ -32,6 +32,9 @@
             <excludes>
                 <exclude>**/App.class</exclude>
             </excludes>
+            <includes>
+                <include>**/*.class</include>
+            </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>/</outputDirectory>
@@ -41,6 +44,10 @@
             <includes>
                 <include>**/App.class</include>
             </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/webapp</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

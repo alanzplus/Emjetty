@@ -57,11 +57,12 @@ public class EmbeddedServletContainer {
 
     public EmbeddedServletContainer start() throws Exception {
         server.start();
+        server.join();
         return this;
     }
 
-    public EmbeddedServletContainer join() throws Exception {
-        server.join();
+    public EmbeddedServletContainer stop() throws Exception {
+        server.stop();
         return this;
     }
 

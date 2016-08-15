@@ -8,22 +8,26 @@ Take `emjetty-examples/emjetty-examples-servlet-container` as an example, the fo
 
 ```
 pom.xml
-src
-├── assembly
-│   └── bootstrap.xml
-└── main
-    ├── java
-    │   └── org
-    │       └── zlambda
-    │           └── projects
-    │               └── emjetty
-    │                   └── examples
-    │                       ├── App.java
-    │                       └── HelloWorldServlet.java
-    ├── resources
-    └── webapp
-        └── WEB-INF
-            └── web.xml
+src                                                                                                                                                                                                                                                                                   
+├── assembly                                                                                                                                                                                                                                                                          
+│   └── bootstrap.xml                                                                                                                                                                                                                                                                 
+└── main                                                                                                                                                                                                                                                                              
+    ├── java                                                                                                                                                                                                                                                                          
+    │   └── org                                                                                                                                                                                                                                                                       
+    │       └── zlambda                                                                                                                                                                                                                                                               
+    │           └── projects                                                                                                                                                                                                                                                          
+    │               └── emjetty                                                                                                                                                                                                                                                       
+    │                   └── examples                                                                                                                                                                                                                                                  
+    │                       ├── App.java                                                                                                                                                                                                                                              
+    │                       └── HelloWorldServlet.java                                                                                                                                                                                                                                
+    ├── resources                                                                                                                                                                                                                                                                     
+    │   └── test.resource                                                                                                                                                                                                                                                             
+    └── webapp                                                                                                                                                                                                                                                                        
+        ├── assets                                                                                                                                                                                                                                                                    
+        ├── index.html                                                                                                                                                                                                                                                                
+        └── WEB-INF                                                                                                                                                                                                                                                                   
+            ├── db.properties                                                                                                                                                                                                                                                         
+            └── web.xml  
 ```
 
 Then let's go through the steps of creating an executable war.
@@ -117,6 +121,9 @@ Here is the `bootstrap.xml`
                 <!-- change the name to your bootstrap class -->
                 <exclude>**/App.class</exclude>
             </excludes>
+            <includes>
+                <include>**/*.class</include>
+            </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>/</outputDirectory>
@@ -129,6 +136,10 @@ Here is the `bootstrap.xml`
                 <include>**/App.class</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>src/main/webapp</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
 ```
@@ -140,12 +151,20 @@ package org.zlambda.projects.emjetty.examples;
 import org.zlambda.projects.emjetty.core.EmbeddedServletContainer;
 public class App {
     public static void main(String[] args) throws Exception {
-        new EmbeddedServletContainer.Builder(App.class).build().start().join();
+        EmbeddedServletContainer container = new EmbeddedServletContainer.Builder(App.class).build().start();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                container.stop();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }));
     }
 }
+
 ```
 
-Finally, you just need to invoke the maven to build your project into an executable war and excute it.
+Finally, you just need to invoke the maven to build your project into an executable war and execute it.
 
 ```bash
 mvn clean package # output it target/emjetty-examples-servlet-container-1.0.0-SNAPSHOT-embedded-jetty-war.war
