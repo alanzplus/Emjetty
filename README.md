@@ -1,62 +1,44 @@
 # Embedded Jetty
 This project help quickly embed Jetty into application.
 
-# TODO
-
-## Better structure executable war
-
-Provide custom class loader to bootstrap application. Then we can have a better executable war structure
-
-```
-executable war
-    ...
-    org/zlambda/projects/emjetty/bootstrap/ExecutableWarBootstrap.class
-    - WEB-INF
-        ...
-        - classes
-        - lib
-            - user application dependencies
-        - lib-provided
-            - emjetty-core.jar
-```
-
 # Embedded Servlet Container
-Class `EmbeddedServletContainer` helps build an executable war. Simply, you just create your servlet web application like the way you do with the traditional container. 
-
-Take `emjetty-examples/emjetty-examples-servlet-container` as an example, the following is project structure. The project structure is same as the traditional servelt web application structure except that you need to create two more files, `assembly/bootstrap.xml` and `App.java` (`App.java` is the bootstrap class)
+`EmbeddedServletContainer` and `Bootstrap` help build an executable war. Simply, you just create your servlet web application like the way you do with the traditional container.
+Take `examples/exec-war-example` as an example, the following is project structure. The project structure is same as the traditional servelt web application structure except that you need to add one more file `assembly/bootstrap.xml`.
 
 ```
 pom.xml
-src                                                                                                                                                                                                                                                                                   
-├── assembly                                                                                                                                                                                                                                                                          
-│   └── bootstrap.xml                                                                                                                                                                                                                                                                 
-└── main                                                                                                                                                                                                                                                                              
-    ├── java                                                                                                                                                                                                                                                                          
-    │   └── org                                                                                                                                                                                                                                                                       
-    │       └── zlambda                                                                                                                                                                                                                                                               
-    │           └── projects                                                                                                                                                                                                                                                          
-    │               └── emjetty                                                                                                                                                                                                                                                       
-    │                   └── examples                                                                                                                                                                                                                                                  
-    │                       ├── App.java                                                                                                                                                                                                                                              
-    │                       └── HelloWorldServlet.java                                                                                                                                                                                                                                
-    ├── resources                                                                                                                                                                                                                                                                     
-    │   └── test.resource                                                                                                                                                                                                                                                             
-    └── webapp                                                                                                                                                                                                                                                                        
-        ├── assets                                                                                                                                                                                                                                                                    
-        ├── index.html                                                                                                                                                                                                                                                                
-        └── WEB-INF                                                                                                                                                                                                                                                                   
-            ├── db.properties                                                                                                                                                                                                                                                         
-            └── web.xml  
+src
+├── assembly
+│   └── bootstrap.xml
+└── main
+    ├── java
+    │   └── org
+    │       └── zlambda
+    │           └── projects
+    │               └── emjetty
+    │                   └── examples
+    │                       ├── HelloworldServlet.java
+    │                       └── Listener.java
+    ├── resources
+    │   └── log4j2.properties
+    └── webapp
+        └── WEB-INF
+            └── emjetty
+                └── config.properties
 ```
 
 Then let's go through the steps of creating an executable war.
 
-First we need to modify `pom.xml` file. You need to add `emjetty-core` dependency to your project with following setting
+First we need to modify `pom.xml` file. You need to add `exec-war-boostrap` and `exec-war-container` to your dependencies
 
 ```xml
 <dependency>
     <groupId>org.zlambda.projects.emjetty</groupId>
-    <artifactId>emjetty-core</artifactId>
+    <artifactId>exec-war-bootstrap</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.zlambda.projects.emjetty</groupId>
+    <artifactId>exec-war-container</artifactId>
     <!-- emjetty-core is deployed with two artifacts -->
     <!-- one is the general jar and other one is the jar with all dependencies (jetty) -->
     <!-- Here we must use the one will the dependencies, so specify the classifier to select it -->
@@ -65,55 +47,50 @@ First we need to modify `pom.xml` file. You need to add `emjetty-core` dependenc
 </dependency>
 ```
 
-and configure the maven-assembly-plugin like the following one
+and then add the following plugin configuration
 
 ```xml
-<build>
-    <plugins>
-        <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-        </plugin>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>make-executable-war</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <descriptors>
-                    <descriptor>src/assembly/bootstrap.xml</descriptor>
-                </descriptors>
-                <archive>
-                    <manifest>
-                        <!-- bootstrap class entrypoint -->
-                        <!-- what you need to do is just modify here -->
-                        <!-- change the name to your bootstrap class -->
-                        <mainClass>org.zlambda.projects.emjetty.examples.App</mainClass>
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-assembly-plugin</artifactId>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>single</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <descriptors>
+            <descriptor>src/assembly/bootstrap.xml</descriptor>
+        </descriptors>
+        <archive>
+            <manifest>
+                <mainClass>org.zlambda.projects.emjetty.execwar.Bootstrap</mainClass>
+            </manifest>
+        </archive>
+    </configuration>
+</plugin>
 ```
 
-Here is the `bootstrap.xml`
+Finally create your `assembly/bootstrap.xml` by copying the following one (don't need to change anything)
+
 ```xml
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
-    <id>embedded-jetty-war</id>
+    <id>embedded-jetty</id>
     <formats>
         <format>war</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
+            <excludes>
+                <exclude>org.zlambda.projects.emjetty:exec-war-bootstrap</exclude>
+                <exclude>org.zlambda.projects.emjetty:exec-war-container</exclude>
+            </excludes>
             <outputDirectory>/WEB-INF/lib</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
@@ -121,7 +98,16 @@ Here is the `bootstrap.xml`
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.zlambda.projects.emjetty:emjetty-core</include>
+                <include>org.zlambda.projects.emjetty:exec-war-container</include>
+            </includes>
+            <outputDirectory>/WEB-INF/lib-provided</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.zlambda.projects.emjetty:exec-war-bootstrap</include>
             </includes>
             <outputDirectory>/</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
@@ -132,28 +118,7 @@ Here is the `bootstrap.xml`
     <fileSets>
         <fileSet>
             <outputDirectory>/WEB-INF/classes</outputDirectory>
-            <directory>
-                ${project.build.outputDirectory}
-            </directory>
-            <excludes>
-                <!-- what you need to do is just modify here -->
-                <!-- change the name to your bootstrap class -->
-                <exclude>**/App.class</exclude>
-            </excludes>
-            <includes>
-                <include>**/*.class</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>/</outputDirectory>
-            <directory>
-                ${project.build.outputDirectory}
-            </directory>
-            <includes>
-                <!-- what you need to do is just modify here -->
-                <!-- change the name to your bootstrap class -->
-                <include>**/App.class</include>
-            </includes>
+            <directory>${project.build.outputDirectory}</directory>
         </fileSet>
         <fileSet>
             <directory>src/main/webapp</directory>
@@ -163,30 +128,23 @@ Here is the `bootstrap.xml`
 </assembly>
 ```
 
-Then, look at the boostrap class `App.class`. It is really simple. And of course, you can configure server settings like port, etc.
-
-```java
-package org.zlambda.projects.emjetty.examples;
-import org.zlambda.projects.emjetty.core.EmbeddedServletContainer;
-public class App {
-    public static void main(String[] args) throws Exception {
-        EmbeddedServletContainer container = new EmbeddedServletContainer.Builder(App.class).build().start();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                container.stop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }));
-    }
-}
-
-```
-
 Finally, you just need to invoke the maven to build your project into an executable war and execute it.
 
 ```bash
-mvn clean package # output it target/emjetty-examples-servlet-container-1.0.0-SNAPSHOT-embedded-jetty-war.war
-java -jar target/emjetty-examples-servlet-container-1.0.0-SNAPSHOT-embedded-jetty-war.war
+mvn clean package # output target/exec-war-example-1.0.0-SNAPSHOT-embedded-jetty.war
+java -jar target/exec-war-example-1.0.0-SNAPSHOT-embedded-jetty.war
+```
+
+## About Logging
+`EmbeddedServletContainer` uses `log4j2` for logging, you need to provide log4j2 configuration by creating a file `log4j2.properties` under `resources` folder.
+
+## About Server Configuration
+Configuration of the server is through `config.properties` file stored under `webapp/WEB-INF/emjetty` (you need to create yourself)
+
+Current implementation only supports configure the port and root context path
+
+```
+port=9999
+rootPath=/
 ```
 
